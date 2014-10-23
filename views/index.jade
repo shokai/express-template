@@ -1,15 +1,27 @@
 extends layout
 
 block scripts
+  script.
+    var chatLogs = !{JSON.stringify(chat.messages)};
   script(src="/socket.io/socket.io.js")
   script(src="/coffee/index.coffee" type="text/coffeescript")
 
+block templates
+  script(type="text/template" id="input-template")
+    input.from(value!="<%- from %>")
+    input.body(value!="<%- body %>" size=40)
+    input.send(type="button" value="send")
+
+  script(type="text/template" id="message-template")
+    span.view <%- from %> : <%- body %>
+    span.edit
+      input(value!="<%- body %>" size=40)
+    input.delete(value="x" type="button")
+
+  script(type="text/template" id="logs-template")
+    ul
+
 block content
   h1= title
-  p
-    input(type="text" value="NoName" id="input_name")
-    input(type="text" value="hello!!" size=40 id="input_message")
-    input(type="button" value="send" id="btn_send")
-  ul#logs
-    - for msg in chat.messages
-      li= msg.from+" : "+msg.body
+  div#input-region
+  div#logs-region

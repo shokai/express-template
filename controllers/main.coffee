@@ -16,7 +16,7 @@ module.exports = (app) ->
       args =
         title: config.title
         chat:
-          messages: msgs
+          messages: msgs.map (i) -> i.to_hash()
         app:
           homepage: package_json.homepage
 

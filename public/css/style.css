@@ -10,3 +10,8 @@ a{
 .label{
   margin: 5px;
 }
+
+.message .delete{
+  margin-left: 5px;
+  border-style: none;
+}

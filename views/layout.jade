@@ -4,11 +4,15 @@ html
   head
     title= title
     link(rel="stylesheet" href="/css/style.css")
+    block templates
   body
     block content
     hr
     p
       a(href=app.homepage)= app.homepage
-    script(src="/js/jquery.min.js")
-    script(src="/js/coffee-script.js")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/backbone.marionette/2.2.2/backbone.marionette.min.js")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/coffee-script/1.7.1/coffee-script.min.js")
     block scripts
