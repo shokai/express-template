@@ -11,6 +11,7 @@ Express Template (Chat App)
 - socket.io 1.1
 - mongoose 3.8 + connect-mongo
 - jade
+- backbone + marionette
 - coffee-script on browser
 - grunt + coffeelint + mocha + supertest
 - Heroku
