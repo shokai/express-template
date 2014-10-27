@@ -13,8 +13,16 @@ block templates
     input.send(type="button" value="send")
 
   script(type="text/template" id="message-template")
-    span.view <%- from %> : <%- body %>
+    span.noedit
+      span.from <%- from %>
+      span :
+      span.body <%- body %>
+    input.delete(value="x" type="button")
+
+  script(type="text/template" id="message-template-edit")
     span.edit
+      span.from <%- from %>
+      span :
       input(value!="<%- body %>" size=40)
     input.delete(value="x" type="button")
 

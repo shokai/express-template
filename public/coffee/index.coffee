@@ -13,8 +13,8 @@ App.addRegions
 App.addInitializer (opts) ->
   console.log 'app start'
   @logs = new Logs chatLogs
-  logsView = new LogsView collection: @logs
-  App.logsRegion.show logsView
+  @logsView = new LogsView collection: @logs
+  App.logsRegion.show @logsView
   App.inputRegion.show new InputView
 
   ## send ##
@@ -37,6 +37,8 @@ App.addInitializer (opts) ->
 
   ## edit ##
   App.on 'message:edit', (message) ->
+    if message.get('body').length < 1
+      return App.trigger 'message:delete', message
     socket.emit 'message:edit', message.attributes
 
   socket.on 'message:edit', (data) ->
@@ -55,35 +57,42 @@ Message = Backbone.Model.extend
   idAttribute: '_id'
 
 MessageView = Backbone.Marionette.ItemView.extend
-  template: '#message-template'
   tagName:  'li'
   className:'message'
+  getTemplate: ->
+    if @model.get 'isEdit'
+      '#message-template-edit'
+    else
+      '#message-template'
   events:
     'click .delete': ->
-      @delete()
+      App.trigger 'message:delete', @model
     'mouseover': ->
       @.$('.delete').show()
     'mouseout': ->
       @.$('.delete').hide()
-    'click .view': ->
-      @.$('.edit').show()
-      @.$('.view').hide()
+    'click .noedit': ->
+      @model.set 'isEdit', true
+      @.$('input').focus()
     'keydown .edit input': (e) ->
       if e.keyCode is 13
-        body = @.$('.edit input').val()
-        @model.set 'body', body
-        if body.length < 1
-          return @delete()
         App.trigger 'message:edit', @model
-  modelEvents:
-    'change': ->
+        @model.set 'isEdit', false
+  modelEvents: ->
+    'change:isEdit': ->
       @render()
-  delete: ->
-    App.trigger 'message:delete', @model
-
+  bindings:
+    '.edit input': 'body'
+    '.from': 'from'
+    '.body': 'body'
   onRender: ->
     @.$('.delete').hide()
-    @.$('.edit').hide()
+    @.$el.hide().fadeIn 300
+    @stickit()
+  destroy: ->
+    @.$el.fadeOut 500, =>
+      Backbone.Marionette.ItemView.prototype.destroy.apply this, arguments
+
 
 Logs = Backbone.Collection.extend
   model: Message
@@ -97,33 +106,26 @@ LogsView = Backbone.Marionette.CompositeView.extend
   childView: MessageView
   childViewContainer: 'ul'
 
-inputModel = new Message
-  body: 'hello!'
-  from: 'NoName'
-
 InputView = Backbone.Marionette.ItemView.extend
   template: '#input-template'
   tagName:  'div'
   id: 'input-view'
-  model: inputModel
+  model: new Message
+    body: 'hello!'
+    from: 'NoName'
   events:
     'click .send': 'send'
     'keydown .body': (e) ->
       if e.keyCode is 13
         @send()
-    'keyup .body': 'bodyChanged'
-    'keyup .from': 'fromChanged'
-
+  bindings:
+    '.from': 'from'
+    '.body': 'body'
   send: ->
-    @.$('.body').val('')
     App.trigger 'input:send', @model
-
-  bodyChanged: ->
-    @model.set body: @.$('.body').val()
-
-  fromChanged: ->
-    @model.set from: @.$('.from').val()
-
+    @model.set 'body', ''
+  onRender: ->
+    @stickit()
 
 $ ->
   console.log 'start'
